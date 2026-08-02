@@ -1,0 +1,11 @@
+# mako config file
+
+# global options
+sort=+priority
+
+# binding options
+
+# style options
+font=sans 10
+default-timeout=5000
+

@@ -1,0 +1,14 @@
+width=25%
+height=30%
+x=960
+y=0
+mode=drun
+prompt= 
+colors=colors
+filter_rate=100
+allow_markup=true
+no_actions=true
+halign=fill
+orientation=vertical
+content_halign=fill
+drun-display_generic=true

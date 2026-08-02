@@ -1,0 +1,11 @@
+*
+!*/
+!.gitignore
+!nvim/**
+!hypr/**
+!waybar/**
+custom-waybar/
+waybar.old/
+!mako/**
+!wofi/**
+!rofi/**

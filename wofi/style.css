@@ -1,0 +1,47 @@
+* {
+	font-size: 15px;
+	font-family: sans; /*source-code-pro;*/
+}
+
+window {
+	margin: 5px;
+	/*border: 2px solid red;*/
+	background-color: #1a1a1a;/*#292b2e;*/
+}
+
+#input {
+	margin: 5px;
+	border: 2px solid #1a1a1a;
+	background-color: #1a1a1a;
+	border-radius: 20px;
+	color: #EDE7D5;
+}
+
+#inner-box {
+	margin: 5px;
+	border: 2px solid #292b2e; 
+	background-color: #292b2e;
+}
+
+#outer-box {
+	margin: 5px;
+	border: 2px solid #292b2e;
+	background-color: #292b2e;
+}
+
+@keyframes erscheinen {
+    from {opacity: 0;}
+      to {opacity: 1;}
+}
+
+#scroll {
+	margin: 5px;
+	/*border: 2px solid orange;
+	  background-color: orange;*/
+	animation: erscheinen 0.3s linear;
+}
+
+#text {
+	margin: 5px;
+	color: #EDE7D5;
+}

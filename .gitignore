@@ -1,7 +1,6 @@
 *
 !*/
 !.gitignore
-!nvim/**
 !hypr/**
 !waybar/**
 custom-waybar/
@@ -9,3 +8,10 @@ waybar.old/
 !mako/**
 !wofi/**
 !rofi/**
+!nvim/**
+nvim.bak/
+tags
+test.sh
+.luarc.json
+spell/
+lazy-lock.json

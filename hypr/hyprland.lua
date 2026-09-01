@@ -5,6 +5,7 @@ require("modules.autostart")
 require("modules.rules")
 require("modules.binds")
 require("modules.split-monitor")
+-- require("tray")
 
 --[[
 local machine = os.getenv("XDG_SESSION_OPT") or "cel"

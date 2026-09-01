@@ -54,11 +54,11 @@ return {
         stopAtBeginningOfMainSubprogram = false,
       },
       {
-        name = 'Attach to arm-none-eabi-gdb server :1234',
+        name = 'Attach to arm-none-eabi-gdb server :4242',
         type = 'arm_none_eabi_gdb',
         request = 'attach',
         target = function()
-          return vim.fn.input('Hostname of server: ', 'localhost') .. '4242'
+          return 'extended ' .. vim.fn.input('Hostname of server: ', 'localhost') .. ':4242'
         end,
         program = function()
           return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')

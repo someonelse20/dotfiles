@@ -1,0 +1,11 @@
+wallpaper {
+	monitor = HDMI-A-1
+	path =  /home/william/Pictures/52723746397_7c31e112aa_o.jpg
+}
+
+wallpaper {
+	monitor = DP-1
+	path =  /home/william/Pictures/52822620435_9ea49c9c57_o.jpg
+}
+
+splash = false

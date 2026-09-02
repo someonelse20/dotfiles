@@ -2,6 +2,7 @@
 !*/
 !.gitignore
 !hypr/**
+hypr/hyprpaper.conf
 !waybar/**
 custom-waybar/
 waybar.old/
@@ -11,6 +12,7 @@ waybar.old/
 !kitty/**
 !nvim/**
 nvim.bak/
+!quickshell/**
 tags
 test.sh
 .luarc.json

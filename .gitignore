@@ -12,6 +12,7 @@ waybar.old/
 !kitty/**
 !nvim/**
 nvim.bak/
+!quickshell/**
 tags
 test.sh
 .luarc.json

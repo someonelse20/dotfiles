@@ -88,6 +88,14 @@ ShellRoot {
                     Layout.fillWidth: true
                 }
 
+                Widgets.Network {}
+
+                Rectangle {
+                    width: 1
+                    height: 16
+                    color: Theme.get.colMuted
+                }
+
                 Widgets.Audio {}
 
                 Rectangle {
@@ -105,6 +113,14 @@ ShellRoot {
                 }
 
                 Widgets.Memory {}
+
+                Rectangle {
+                    width: 1
+                    height: 16
+                    color: Theme.get.colMuted
+                }
+
+                Widgets.Battery {}
 
                 Rectangle {
                     width: 1

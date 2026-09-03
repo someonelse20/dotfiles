@@ -6,7 +6,7 @@ import "root:/"
 
 // CPU
 Text {
-    text: "CPU: " + cpuUsage + "%"
+    text: " " + cpuUsage + "%"
     color: Theme.get.colFg
     font {
         family: Theme.get.fontFamily

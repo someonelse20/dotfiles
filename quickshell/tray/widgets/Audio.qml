@@ -12,7 +12,10 @@ Text {
         if (!Pipewire.ready)
             return 0;
 
-        return 0;
+        if (!Pipewire.defaultAudioSink)
+            return 0;
+
+        return Pipewire.defaultAudioSink.audio.volume;
     }
 
     text: volIcon + getVol()

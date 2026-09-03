@@ -6,7 +6,7 @@ import "root:/"
 
 // Memory
 Text {
-    text: "Mem: " + memUsage + "%"
+    text: " " + memUsage + "%"
     color: Theme.get.colFg
     font {
         family: Theme.get.fontFamily

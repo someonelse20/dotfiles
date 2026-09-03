@@ -1,6 +1,7 @@
 -- autostart
 hl.on("hyprland.start", function()
-	hl.exec_cmd("[workspace 1] waterfox")
+	hl.exec_cmd("qs")
+	hl.exec_cmd("[workspace 1] librewolf")
 	hl.exec_cmd("[workspace 2] kitty")
 end)
 

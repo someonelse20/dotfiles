@@ -1,134 +1,216 @@
 import Quickshell
 import Quickshell.Io
-import Quickshell.Wayland
-import Quickshell.Hyprland
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Layouts
 
-import "widgets" as Widgets
-import "root:/"
-
 ShellRoot {
+    id: root
+
     Variants {
         model: Quickshell.screens
         PanelWindow {
-            id: root
-            property var modelData
-            screen: modelData
+            id: panel
 
-            // System data
-            property int cpuUsage: 0
-            property int memUsage: 0
-            property var lastCpuIdle: 0
-            property var lastCpuTotal: 0
-
-            // Get cpu usage
-            Process {
-                id: cpuProc
-                command: ["sh", "-c", "head -1 /proc/stat"]
-                stdout: SplitParser {
-                    onRead: data => {
-                        if (!data)
-                            return;
-                        var p = data.trim().split(/\s+/);
-                        var idle = parseInt(p[4]) + parseInt(p[5]);
-                        var total = p.slice(1, 8).reduce((a, b) => a + parseInt(b), 0);
-                        if (lastCpuTotal > 0) {
-                            cpuUsage = Math.round(100 * (1 - (idle - lastCpuIdle) / (total - lastCpuTotal)));
-                        }
-                        lastCpuTotal = total;
-                        lastCpuIdle = idle;
-                    }
-                }
-                Component.onCompleted: running = true
-            }
-
-            // Get memory usage
-            Process {
-                id: memProc
-                command: ["sh", "-c", "free | grep Mem"]
-                stdout: SplitParser {
-                    onRead: data => {
-                        if (!data)
-                            return;
-                        var parts = data.trim().split(/\s+/);
-                        var total = parseInt(parts[1]) || 1;
-                        var used = parseInt(parts[2]) || 0;
-                        memUsage = Math.round(100 * used / total);
-                    }
-                }
-                Component.onCompleted: running = true
-            }
-
-            // Timers for processes
-            Timer {
-                interval: 1000
-                running: true
-                repeat: true
-                onTriggered: {
-                    cpuProc.running = true;
-                    memProc.running = true;
-                }
-            }
-
-            anchors.top: true
-            anchors.left: true
-            anchors.right: true
-            implicitHeight: 30
-            color: Theme.get.colBg
-
-            RowLayout {
+            // Overlay background
+            Rectangle {
                 anchors.fill: parent
-                anchors.margins: 8
-                spacing: 8
+                color: "rgba(0,0,0,0.4)"
+            }
 
-                Widgets.Workspaces {}
+            // Search popup
+            Rectangle {
+                id: popup
+                anchors.centerIn: parent
+                width: 520
+                height: 380
+                radius: 8
+                color: Theme.get.colBg
+                clip: true
 
-                Item {
-                    Layout.fillWidth: true
+                property var commands: []
+                property var filteredCommands: []
+                property int currentIndex: 0
+                property bool isRunning: false
+
+                // Search input
+                TextInput {
+                    id: searchInput
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    height: 44
+                    font.pixelSize: 15
+                    placeholderText: "Type to search GUI commands..."
+                    color: Theme.get.colFg
+                    selectByMouse: true
+
+                    // Filter on input
+                    onTextChanged: {
+                        var term = searchInput.text.toLowerCase()
+                        if (term.length === 0) {
+                            filteredCommands = commands
+                        } else {
+                            filteredCommands = commands.filter(c => c.toLowerCase().includes(term))
+                        }
+                        if (filteredCommands.length === 0) {
+                            currentIndex = -1
+                        } else if (currentIndex >= filteredCommands.length) {
+                            currentIndex = filteredCommands.length - 1
+                        }
+                    }
+
+                    // Blur on escape
+                    Keys.onPressed: event => {
+                        if (event.key === Qt.Key_Escape) {
+                            event.accepted = true
+                            popup.close()
+                        }
+                    }
                 }
 
-                Widgets.Network {}
+                // Command list
+                ListView {
+                    id: listView
+                    anchors.top: searchInput.bottom
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    height: 320
+                    clip: true
 
-                Rectangle {
-                    width: 1
-                    height: 16
+                    model: filteredCommands.length > 0 ? filteredCommands : []
+
+                    delegate: Item {
+                        width: listView.width
+                        height: 44
+
+                        Text {
+                            anchors.centerIn: parent
+                            text: name
+                            font.pixelSize: 14
+                            color: Theme.get.colFg
+                            elide: Text.ElideRight
+                            // Highlight selected item
+                            color: ListView.view.currentIndex === index ? Theme.get.colAccent : Theme.get.colFg
+                        }
+                    }
+
+                    // Scroll indicator
+                    ScrollIndicator.vertical: ScrollIndicator {
+                        Rectangle {
+                            color: Theme.get.colMuted
+                            width: parent.width
+                            height: 6
+                        }
+                    }
+
+                    // Navigation keys
+                    Keys.onPressed: event => {
+                        if (event.key === Qt.Key_Down) {
+                            event.accepted = true
+                            currentIndex++
+                            if (currentIndex >= filteredCommands.length) {
+                                currentIndex = 0
+                            }
+                        } else if (event.key === Qt.Key_Up) {
+                            event.accepted = true
+                            currentIndex--
+                            if (currentIndex < 0) {
+                                currentIndex = filteredCommands.length - 1
+                            }
+                        }
+                    }
+                }
+
+                // Help bar
+                RowLayout {
+                    anchors.bottom: parent.bottom
+                    spacing: 12
+                    font.pixelSize: 12
                     color: Theme.get.colMuted
+                    Text {
+                        text: "↑↓ Navigate • Enter Select • Esc Close"
+                    }
                 }
 
-                Widgets.Audio {}
-
-                Rectangle {
-                    width: 1
-                    height: 16
-                    color: Theme.get.colMuted
+                // Close on escape
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Escape) {
+                        event.accepted = true
+                        popup.close()
+                    }
                 }
 
-                Widgets.Cpu {}
-
-                Rectangle {
-                    width: 1
-                    height: 16
-                    color: Theme.get.colMuted
+                // Open popup when focused
+                onShowing: {
+                    if (!isRunning) {
+                        loadCommands()
+                    }
+                    isRunning = true
+                    listView.focus = true
+                    searchInput.focus = true
                 }
 
-                Widgets.Memory {}
+                // Close when hidden
+                onHiding: isRunning = false
 
-                Rectangle {
-                    width: 1
-                    height: 16
-                    color: Theme.get.colMuted
+                // Load commands from Python script
+                Process {
+                    id: cmdProc
+                    property string stdout: ""
+                    active: false
+
+                    onFinished: {
+                        if (exitCode === 0) {
+                            var data = cmdProc.stdout
+                            try {
+                                commands = JSON.parse(data)
+                            } catch (e) {
+                                console.error("JSON parse error:", e)
+                                commands = []
+                            }
+                        } else {
+                            console.error("search_cmds.py failed:", cmdProc.stderr)
+                            commands = []
+                        }
+                        active = false
+                    }
+
+                    onStarted: {
+                        stdout = ""
+                        active = true
+                    }
+
+                    onStandardOutput: data => {
+                        stdout += data.toString()
+                    }
+
+                    Component.onCompleted: {
+                        run()
+                    }
                 }
 
-                Widgets.Battery {}
-
-                Rectangle {
-                    width: 1
-                    height: 16
-                    color: Theme.get.colMuted
+                function loadCommands() {
+                    cmdProc.start("/usr/bin/env", ["python3", "~/.config/quickshell/scripts/search_cmds.py"])
                 }
 
-                Widgets.Clock {}
+                function selectCommand() {
+                    if (filteredCommands.length === 0) return
+                    var cmd = filteredCommands[currentIndex]
+                    if (!cmd) return
+                    // Launch the command (Quickshell will handle execution)
+                    // Quickshell integration: emit or call your command runner
+                    console.log("Selected:", cmd)
+                    popup.close()
+                }
+
+                Keys.onPressed: event => {
+                    if (event.key === Qt.Key_Return) {
+                        event.accepted = true
+                        selectCommand()
+                    }
+                }
             }
         }
     }

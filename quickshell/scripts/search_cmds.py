@@ -1,62 +1,69 @@
 #!/usr/bin/env python3
 """
-search_cmds.py
-
-Scans PATH and emits a JSON list of shell commands.
-Useful as the backend for a QML search popup.
+search_cmds.py — Returns GUI-app commands via desktop file metadata.
+Place in .config/quickshell/scripts/search_cmds.py
 """
 
-import subprocess
-import json
-import os
-import sys
+import subprocess, json, os, sys, fnmatch
 
+APP_DIRS = ["/usr/share/applications", "~/.local/share/applications"]
 
-def get_path_dirs():
-    """Yield each directory in PATH."""
-    path_dirs = os.environ.get("PATH", "")
-    if not path_dirs:
-        return
-    for d in path_dirs.split(os.pathsep):
-        d = d.strip()
-        if d:
-            yield d
+def desktop_files():
+    for d in APP_DIRS:
+        d = os.path.expanduser(d)
+        if os.path.isdir(d):
+            yield from os.scandir(d)
 
+def has_gui_desktop(cmd):
+    """Return True if `cmd` is known as a graphical app via desktop file."""
+    for f in desktop_files():
+        if not f.is_file() or not f.name.endswith(".desktop"):
+            continue
+        if f.name.lower().find(cmd.lower()) == -1:
+            continue
+        try:
+            with open(f.path, "r", encoding="utf-8", errors="ignore") as fp:
+                for line in fp:
+                    line = line.strip()
+                    if line.startswith("[") or line.startswith("#") or not line:
+                        continue
+                    if "=" not in line:
+                        continue
+                    key, _, val = line.partition("=")
+                    key, val = key.strip(), val.strip()
+                    if key == "NoDisplay" and val.lower() == "true":
+                        return False
+                    if key in ("Exec", "ExecTry", "Name") and val.lower() == cmd.lower():
+                        return True
+                    if key in ("Exec", "Name") and fnmatch.fnmatch(cmd.lower(), val.lower()):
+                        return True
+        except OSError:
+            continue
+    return False
 
 def scan_commands():
-    """
-    Use compgen -c to get a list of valid shell commands.
-    This reads from stdin and outputs each command on its own line.
-    We pipe it through head -N to keep the list small enough for UI.
-    """
-    N = 500  # tweak to your taste
+    N = 500
     try:
-        # compgen -c outputs commands known to the shell
         proc = subprocess.run(
             ["sh", "-c", f"compgen -c | head -N {N}"],
-            capture_output=True,
-            text=True,
-            check=True,
+            capture_output=True, text=True, check=True
         )
-        return [line.strip() for line in proc.stdout.splitlines() if line.strip()]
-    except subprocess.CalledProcessError as e:
-        # Fallback to listing binaries in PATH if compgen fails
+        cmds = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+    except subprocess.CalledProcessError:
         cmds = []
-        for d in get_path_dirs():
+        for d in os.environ.get("PATH", "").split(os.pathsep):
             if not os.path.isdir(d):
                 continue
             for f in os.listdir(d):
-                fpath = os.path.join(d, f)
-                if os.path.isfile(fpath) and os.access(fpath, os.X_OK):
+                fp = os.path.join(d, f)
+                if os.path.isfile(fp) and os.access(fp, os.X_OK):
                     cmds.append(f)
-        return cmds[:N]
-
+    return cmds
 
 def main():
     cmds = scan_commands()
-    print(json.dumps(cmds))
-    sys.exit(0)
-
+    gui = [c for c in cmds if has_gui_desktop(c)]
+    print(json.dumps(gui))
 
 if __name__ == "__main__":
     main()

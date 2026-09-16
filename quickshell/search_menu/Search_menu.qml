@@ -4,6 +4,8 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 
+import "root:/"
+
 ShellRoot {
     id: root
 
@@ -47,24 +49,24 @@ ShellRoot {
 
                     // Filter on input
                     onTextChanged: {
-                        var term = searchInput.text.toLowerCase()
+                        var term = searchInput.text.toLowerCase();
                         if (term.length === 0) {
-                            filteredCommands = commands
+                            filteredCommands = commands;
                         } else {
-                            filteredCommands = commands.filter(c => c.toLowerCase().includes(term))
+                            filteredCommands = commands.filter(c => c.toLowerCase().includes(term));
                         }
                         if (filteredCommands.length === 0) {
-                            currentIndex = -1
+                            currentIndex = -1;
                         } else if (currentIndex >= filteredCommands.length) {
-                            currentIndex = filteredCommands.length - 1
+                            currentIndex = filteredCommands.length - 1;
                         }
                     }
 
                     // Blur on escape
                     Keys.onPressed: event => {
                         if (event.key === Qt.Key_Escape) {
-                            event.accepted = true
-                            popup.close()
+                            event.accepted = true;
+                            popup.close();
                         }
                     }
                 }
@@ -108,16 +110,16 @@ ShellRoot {
                     // Navigation keys
                     Keys.onPressed: event => {
                         if (event.key === Qt.Key_Down) {
-                            event.accepted = true
-                            currentIndex++
+                            event.accepted = true;
+                            currentIndex++;
                             if (currentIndex >= filteredCommands.length) {
-                                currentIndex = 0
+                                currentIndex = 0;
                             }
                         } else if (event.key === Qt.Key_Up) {
-                            event.accepted = true
-                            currentIndex--
+                            event.accepted = true;
+                            currentIndex--;
                             if (currentIndex < 0) {
-                                currentIndex = filteredCommands.length - 1
+                                currentIndex = filteredCommands.length - 1;
                             }
                         }
                     }
@@ -137,19 +139,19 @@ ShellRoot {
                 // Close on escape
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Escape) {
-                        event.accepted = true
-                        popup.close()
+                        event.accepted = true;
+                        popup.close();
                     }
                 }
 
                 // Open popup when focused
                 onShowing: {
                     if (!isRunning) {
-                        loadCommands()
+                        loadCommands();
                     }
-                    isRunning = true
-                    listView.focus = true
-                    searchInput.focus = true
+                    isRunning = true;
+                    listView.focus = true;
+                    searchInput.focus = true;
                 }
 
                 // Close when hidden
@@ -163,52 +165,54 @@ ShellRoot {
 
                     onFinished: {
                         if (exitCode === 0) {
-                            var data = cmdProc.stdout
+                            var data = cmdProc.stdout;
                             try {
-                                commands = JSON.parse(data)
+                                commands = JSON.parse(data);
                             } catch (e) {
-                                console.error("JSON parse error:", e)
-                                commands = []
+                                console.error("JSON parse error:", e);
+                                commands = [];
                             }
                         } else {
-                            console.error("search_cmds.py failed:", cmdProc.stderr)
-                            commands = []
+                            console.error("search_cmds.py failed:", cmdProc.stderr);
+                            commands = [];
                         }
-                        active = false
+                        active = false;
                     }
 
                     onStarted: {
-                        stdout = ""
-                        active = true
+                        stdout = "";
+                        active = true;
                     }
 
                     onStandardOutput: data => {
-                        stdout += data.toString()
+                        stdout += data.toString();
                     }
 
                     Component.onCompleted: {
-                        run()
+                        run();
                     }
                 }
 
                 function loadCommands() {
-                    cmdProc.start("/usr/bin/env", ["python3", "~/.config/quickshell/scripts/search_cmds.py"])
+                    cmdProc.start("/usr/bin/env", ["python3", "~/.config/quickshell/scripts/search_cmds.py"]);
                 }
 
                 function selectCommand() {
-                    if (filteredCommands.length === 0) return
-                    var cmd = filteredCommands[currentIndex]
-                    if (!cmd) return
+                    if (filteredCommands.length === 0)
+                        return;
+                    var cmd = filteredCommands[currentIndex];
+                    if (!cmd)
+                        return;
                     // Launch the command (Quickshell will handle execution)
                     // Quickshell integration: emit or call your command runner
-                    console.log("Selected:", cmd)
-                    popup.close()
+                    console.log("Selected:", cmd);
+                    popup.close();
                 }
 
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Return) {
-                        event.accepted = true
-                        selectCommand()
+                        event.accepted = true;
+                        selectCommand();
                     }
                 }
             }

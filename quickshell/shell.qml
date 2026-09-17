@@ -1,9 +1,10 @@
 import Quickshell
 
 import "tray"
-import "search_menu"
+
+// import "search_menu"
 
 ShellRoot {
     Tray {}
-    Search_menu {}
+    // Search_menu {}
 }

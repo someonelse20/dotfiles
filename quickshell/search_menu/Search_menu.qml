@@ -94,7 +94,7 @@ ShellRoot {
                             color: Theme.get.colFg
                             elide: Text.ElideRight
                             // Highlight selected item
-                            color: ListView.view.currentIndex === index ? Theme.get.colAccent : Theme.get.colFg
+                            // color: ListView.view.currentIndex === index ? Theme.get.colAccent : Theme.get.colFg
                         }
                     }
 
@@ -209,12 +209,14 @@ ShellRoot {
                     popup.close();
                 }
 
+                /*
                 Keys.onPressed: event => {
                     if (event.key === Qt.Key_Return) {
                         event.accepted = true;
                         selectCommand();
                     }
                 }
+				*/
             }
         }
     }

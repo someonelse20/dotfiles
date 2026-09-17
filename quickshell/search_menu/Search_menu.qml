@@ -8,7 +8,6 @@ import "root:/"
 
 ShellRoot {
     id: root
-
     Variants {
         model: Quickshell.screens
         PanelWindow {
@@ -17,7 +16,8 @@ ShellRoot {
             // Overlay background
             Rectangle {
                 anchors.fill: parent
-                color: "rgba(0,0,0,0.4)"
+                color: theme.get.colBg
+                // color: "rgba(0,0,0,0.4)"
             }
 
             // Search popup
@@ -43,7 +43,7 @@ ShellRoot {
                     anchors.top: parent.top
                     height: 44
                     font.pixelSize: 15
-                    placeholderText: "Type to search GUI commands..."
+                    // placeholderText: "Type to search GUI commands..."
                     color: Theme.get.colFg
                     selectByMouse: true
 
@@ -129,9 +129,9 @@ ShellRoot {
                 RowLayout {
                     anchors.bottom: parent.bottom
                     spacing: 12
-                    font.pixelSize: 12
-                    color: Theme.get.colMuted
+                    // color: Theme.get.colMuted
                     Text {
+                        color: Theme.get.colMuted
                         text: "↑↓ Navigate • Enter Select • Esc Close"
                     }
                 }
@@ -144,6 +144,7 @@ ShellRoot {
                     }
                 }
 
+                /*
                 // Open popup when focused
                 onShowing: {
                     if (!isRunning) {
@@ -153,16 +154,15 @@ ShellRoot {
                     listView.focus = true;
                     searchInput.focus = true;
                 }
-
-                // Close when hidden
-                onHiding: isRunning = false
+				*/
 
                 // Load commands from Python script
                 Process {
                     id: cmdProc
                     property string stdout: ""
-                    active: false
+                    // active: false
 
+                    /*
                     onFinished: {
                         if (exitCode === 0) {
                             var data = cmdProc.stdout;
@@ -178,15 +178,18 @@ ShellRoot {
                         }
                         active = false;
                     }
+					*/
 
                     onStarted: {
                         stdout = "";
                         active = true;
                     }
 
+                    /*
                     onStandardOutput: data => {
                         stdout += data.toString();
                     }
+					*/
 
                     Component.onCompleted: {
                         run();

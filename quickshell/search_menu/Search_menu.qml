@@ -30,7 +30,8 @@ ShellRoot {
 
     FloatingWindow {
         id: searchWindow
-        anchors.centerIn: parent
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
         width: 400
         height: 300
         visible: false

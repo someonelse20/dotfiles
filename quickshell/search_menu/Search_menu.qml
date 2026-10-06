@@ -35,7 +35,6 @@ ShellRoot {
         height: 300
         visible: false
         color: Theme.get.colBg
-
         close: { searchWindow.visible = false; return false; }
 
         ScrollView {
@@ -63,14 +62,21 @@ ShellRoot {
                 }
 
                 // Command list
-                Quickshell.SearchList {
+                ListView {
                     id: searchList
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    onSelected: {
-                        var cmd = modelData
+                    model: jsonData
+                    clip: true
+                    delegate: Text {
+                        text: modelData
+                        font.size: 14
+                        font.family: Theme.get.fontFamily
+                        color: Theme.get.colFg
+                    }
+                    onCurrentItemChanged: {
                         if (searchWindow.mode === "execute") {
-                            Quickshell.Io.exec(cmd)
+                            Quickshell.Io.exec(currentItem)
                         } else {
                             searchWindow.mode = "execute"
                             searchWindow.show()

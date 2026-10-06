@@ -36,10 +36,7 @@ ShellRoot {
         visible: false
         color: Theme.get.colBg
 
-        titleBar: Quickshell.TitleBar {
-            text: "Search Menu"
-            close: { searchWindow.visible = false; return false; }
-        }
+        close: { searchWindow.visible = false; return false; }
 
         ScrollView {
             anchors.fill: parent

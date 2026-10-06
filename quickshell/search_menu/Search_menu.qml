@@ -36,7 +36,6 @@ ShellRoot {
         height: 300
         visible: false
         color: Theme.get.colBg
-        close: { searchWindow.visible = false; return false; }
 
         ScrollView {
             anchors.fill: parent

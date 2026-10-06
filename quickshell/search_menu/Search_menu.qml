@@ -88,17 +88,19 @@ ShellRoot {
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 4
-                    Quickshell.SwitchButton {
+                    Button {
                         text: "Search"
-                        checked: !searchWindow.mode
+                        width: 60
+                        height: 24
                         onClicked: {
                             searchWindow.mode = false
                             searchWindow.show()
                         }
                     }
-                    Quickshell.SwitchButton {
+                    Button {
                         text: "Execute"
-                        checked: searchWindow.mode
+                        width: 60
+                        height: 24
                         onClicked: {
                             searchWindow.mode = true
                             searchWindow.show()

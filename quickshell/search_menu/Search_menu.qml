@@ -28,14 +28,21 @@ ShellRoot {
 
     readonly property var jsonData: JSON.parse(jsonFile.text())
 
-    FloatingWindow {
+    Window {
         id: searchWindow
-        x: (parent.width - width) / 2
-        y: (parent.height - height) / 2
+        visible: false
+        x: (root.width - width) / 2
+        y: (root.height - height) / 2
         width: 400
         height: 300
-        visible: false
+        flags: Qt.Window | Qt.WindowStaysOnTopHint
         color: Theme.get.colBg
+
+        onVisibleChanged: {
+            if (!visible) {
+                searchWindow.close()
+            }
+        }
 
         ScrollView {
             anchors.fill: parent
@@ -47,7 +54,6 @@ ShellRoot {
                 anchors.fill: parent
                 spacing: 8
 
-                // Search input
                 TextInput {
                     Layout.fillWidth: true
                     placeholderText: "Type to search or execute..."
@@ -61,7 +67,6 @@ ShellRoot {
                     }
                 }
 
-                // Command list
                 ListView {
                     id: searchList
                     Layout.fillWidth: true
@@ -84,7 +89,6 @@ ShellRoot {
                     }
                 }
 
-                // Mode toggle
                 RowLayout {
                     Layout.alignment: Qt.AlignHCenter
                     spacing: 4

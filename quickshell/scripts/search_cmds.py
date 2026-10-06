@@ -63,7 +63,10 @@ def scan_commands():
 def main():
     cmds = scan_commands()
     gui = [c for c in cmds if has_gui_desktop(c)]
-    print(json.dumps(gui))
+    output = json.dumps(gui)
+    with open("commands.json", "w", encoding="utf-8") as f:
+        f.write(output)
+    print(output)
 
 if __name__ == "__main__":
     main()

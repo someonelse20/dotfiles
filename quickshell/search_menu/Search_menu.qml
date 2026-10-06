@@ -29,11 +29,80 @@ ShellRoot {
     readonly property var jsonData: JSON.parse(jsonFile.text())
 
     FloatingWindow {
+        id: searchWindow
+        anchors.centerIn: parent
+        width: 400
+        height: 300
+        visible: false
         color: Theme.get.colBg
+
+        titleBar: Quickshell.TitleBar {
+            text: "Search Menu"
+            close: { searchWindow.visible = false; return false; }
+        }
 
         ScrollView {
             anchors.fill: parent
+            anchors.margins: 8
             contentWidth: availableWidth
+            contentHeight: availableHeight
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 8
+
+                // Search input
+                TextInput {
+                    Layout.fillWidth: true
+                    placeholderText: "Type to search or execute..."
+                    font.size: 14
+                    onTextChanged: {
+                        var input = text.toLowerCase()
+                        var filtered = jsonData.filter(function(cmd) {
+                            return cmd.toLowerCase().includes(input)
+                        })
+                        searchList.model = filtered
+                    }
+                }
+
+                // Command list
+                Quickshell.SearchList {
+                    id: searchList
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    onSelected: {
+                        var cmd = modelData
+                        if (searchWindow.mode === "execute") {
+                            Quickshell.Io.exec(cmd)
+                        } else {
+                            searchWindow.mode = "execute"
+                            searchWindow.show()
+                        }
+                    }
+                }
+
+                // Mode toggle
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 4
+                    Quickshell.SwitchButton {
+                        text: "Search"
+                        checked: !searchWindow.mode
+                        onClicked: {
+                            searchWindow.mode = false
+                            searchWindow.show()
+                        }
+                    }
+                    Quickshell.SwitchButton {
+                        text: "Execute"
+                        checked: searchWindow.mode
+                        onClicked: {
+                            searchWindow.mode = true
+                            searchWindow.show()
+                        }
+                    }
+                }
+            }
         }
     }
 }

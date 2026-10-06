@@ -10,14 +10,23 @@ import "Theme"
 ShellRoot {
     id: root
 
-    Process {
-        running: true
-        command: ["python", "~/.config/quickshell/scripts/search_cmds.py"]
-        // command: ["sh", "-c", "python", "~/.config/quickshell/scripts/search_cmds.py"]
-        stdout: StdioCollector {
-            onStreamFinished: console.log(`line read: ${this.text}`)
+    // Safe JSON parser
+    function parseJSON(text) {
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.warn("JSON parse error:", e);
+            return ({});
         }
     }
+
+    FileView {
+        id: jsonFile
+        path: Qt.resolvedUrl("~/.config/quickshell/scripts/commands.json")
+        blockLoading: true
+    }
+
+    readonly property var jsonData: JSON.parse(jsonFile.text())
 
     FloatingWindow {
         color: Theme.get.colBg
